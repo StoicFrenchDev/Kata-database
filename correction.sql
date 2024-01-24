@@ -22,3 +22,34 @@ FROM players p
          JOIN characteristics c ON c.id = pc.characteristic_id
 WHERE c.name = 'beard' AND c.value = 'Mustache' AND p.last_name LIKE '%o%'
 GROUP BY p.last_name;
+
+
+/* Affichez tous les joueurs et leurs caractéristiques, y compris ceux qui n'ont pas de caractéristiques assignées.
+ Affichez le prénom, le nom de famille et le nom de la caractéristique. */
+
+SELECT p.first_name, p.last_name, c.name
+FROM players p
+LEFT JOIN player_characteristics pc ON p.id = pc.player_id
+LEFT JOIN characteristics c ON pc.characteristic_id = c.id;
+
+SELECT p.first_name, p.last_name,
+    GROUP_CONCAT(CONCAT(c.name, ': ', c.value) 
+    ORDER BY c.name SEPARATOR ', ') as characteristics
+FROM players p
+LEFT JOIN player_characteristics pc ON p.id = pc.player_id
+LEFT JOIN characteristics c ON pc.characteristic_id = c.id
+GROUP BY p.first_name, p.last_name;
+
+/* Listez tous les joueurs, en indiquant si chacun a des 'glasses' ou non. Utilisez 'Yes' pour indiquer qu'ils ont des lunettes, 'No' si ce n'est pas le cas.
+ Affichez le prénom, le nom de famille et le statut des lunettes. */
+
+ SELECT p.first_name, p.last_name,
+    CASE
+        WHEN c.value = 'True' THEN 'Yes'
+        ELSE 'No'
+    END as has_glasses
+FROM players p
+LEFT JOIN player_characteristics pc ON p.id = pc.player_id AND pc.characteristic_id IN (
+    SELECT id FROM characteristics WHERE name = 'glasses'
+)
+LEFT JOIN characteristics c ON pc.characteristic_id = c.id;
